@@ -1,30 +1,42 @@
-# mware
+# mware-async
 
-`mware` is a utility for creating a middleware stack with any node or browser application. Inspired by the middleware pattern in [connect](https://github.com/senchalabs/connect).
+`mware-async` is an extension to [`mware`](https://github.com/tur-nr/node-mware) but for an async/await style middleware stack.
 
-[![Build Status](https://travis-ci.org/tur-nr/node-mware.svg?branch=master)](https://travis-ci.org/tur-nr/node-mware) [![Coverage Status](https://coveralls.io/repos/github/tur-nr/node-mware/badge.svg?branch=master)](https://coveralls.io/github/tur-nr/node-mware?branch=master)
+[![Build Status](https://travis-ci.org/9technology/mware-async.svg?branch=master)](https://travis-ci.org/9technology/mware-async) [![Coverage Status](https://coveralls.io/repos/github/9technology/mware-async/badge.svg?branch=master)](https://coveralls.io/github/9technology/mware-async?branch=master)
 
 ### Usage
 
 ```js
-import mware from 'mware';
+import mware from 'mware-async';
 const { use, run } = mware();
 
-// add middleware
-use((ctx, next) => {
-    console.assert(ctx === context);
+const context = {};
 
-    return next();                     // next middleware
-    return next(null, true);           // stop the stack
-    return next(new Error('oopsies')); // stop and report error
+// add middleware
+use(async (ctx, next) => {
+    console.assert(ctx === context);
+    console.log('a');
+    await next();
+    console.log('b');
+});
+
+use(async (ctx, next) => {
+    console.log('c');
+    await next();
 });
 
 // run stack
-const context = {};
-run([context], (err) => {
-    if (err) throw err;
-    console.log('stack complete');
-});
+run(context).then(() => console.log('fin')); // a, c, b, fin
+```
+
+#### Errors
+
+```js
+// error middleware
+use(async () => throw new Error('Bad stuff!'));
+
+// run
+run().catch(err => console.error(err)); // [Error: Bad stuff!]
 ```
 
 ## Installation
@@ -32,13 +44,13 @@ run([context], (err) => {
 #### NPM
 
 ```
-npm install --save mware
+npm install --save mware-async
 ```
 
 #### Yarn
 
 ```
-yarn add mware
+yarn add mware-async
 ```
 
 ## API
@@ -49,14 +61,15 @@ Returns a `mware` instance.
 #### Instance
 
 ##### `#use(fn...)`
-* `fn: Function|[]Function`, Middleware functions to add to stack.
+* `fn: Function|[]Function`, Async middleware functions to add to stack.
 
-##### `#run([args], [done])`
-* `args: []*`, List of arguments to pass to each middleware function.
-* `done: Function`, Callback for when the middleware stack has stopped.
+##### `#run([...args])`
+* `args: []*`, Arguments to pass to each middleware function.
+
+Returns a promise.
 
 ## License
 
-[MIT](LICENSE)
+[BSD-3-Clause](LICENSE)
 
-Copyright (c) 2016 [Christopher Turner](https://github.com/tur-nr)
+Copyright (c) 2016 [9Technology](https://github.com/9technology)
