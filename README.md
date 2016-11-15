@@ -64,7 +64,7 @@ Returns a `mware` instance.
 * `fn: Function|[]Function`, Async middleware functions to add to stack.
 
 ##### `#run([...args])`
-* `args: []*`, Arguments to pass to each middleware function.
+* `args: *`, Arguments to pass to each middleware function.
 
 Returns a promise.
 
