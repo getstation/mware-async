@@ -8,7 +8,7 @@
   "scripts": {
     "build": "gulp build",
     "test": "cross-env NODE_ENV=test nyc --reporter=text --reporter=lcov ava",
-    "prepublish": "npm build"
+    "prepublish": "npm run build"
   },
   "repository": {
     "url": "git+https://github.com/9technology/mware-async.git",
