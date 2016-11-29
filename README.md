@@ -1,8 +1,8 @@
 # mware-async
 
-`mware-async` is an extension to [`mware`](https://github.com/tur-nr/node-mware) but for an async/await style middleware stack.
-
 [![Build Status](https://travis-ci.org/9technology/mware-async.svg?branch=master)](https://travis-ci.org/9technology/mware-async) [![Coverage Status](https://coveralls.io/repos/github/9technology/mware-async/badge.svg?branch=master)](https://coveralls.io/github/9technology/mware-async?branch=master)
+
+`mware-async` is an extension to [`mware`](https://github.com/tur-nr/node-mware) but for an async/await style middleware stack.
 
 ### Usage
 
