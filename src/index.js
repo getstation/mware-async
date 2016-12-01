@@ -4,12 +4,10 @@ export default () => {
     const stack = [];
 
     const use = (...fns) => {
-        let i = fns.length;
-        while (i--) {
-            const fn = fns[i];
-            if (Array.isArray(fn)) return use(...fn);
-            if ('function' === typeof fn) stack.push(fn);
-        }
+        fns.forEach((fn) => {
+            if (Array.isArray(fn)) use(...fn);
+            else if ('function' === typeof fn) stack.push(fn);
+        });
     };
 
     const run = (...args) => {
