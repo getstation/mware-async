@@ -39,7 +39,7 @@ export default () => {
       const p = await BluebirdPromise.resolve(fnResult);
       if (p === undefined) return currentArgs;
       return p;
-    }, args);
+    }, args.length === 1 ? args[0] : args);
     return [event, res] as (Event | R)[];
   }
 

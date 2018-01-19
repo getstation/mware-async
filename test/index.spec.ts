@@ -36,6 +36,23 @@ test('calls added middleware', async t => {
   t.deepEqual(res3, 9);
 });
 
+test('is default prevented', async t => {
+  const m = mware();
+
+  m.use(async (event, value) => {
+    if (value === 'prevent') {
+      event.preventDefault();
+    }
+  });
+
+  const [e1, value1] = await m.run(new Event('test'), 'continue');
+  t.false(e1.isDefaultPrevented());
+  t.deepEqual(value1, 'continue');
+  const [e2, value2] = await m.run(new Event('test'), 'prevent');
+  t.true(e2.isDefaultPrevented());
+  t.deepEqual(value2, 'prevent');
+});
+
 test('rejects if error thrown', async t => {
   const m = mware();
   m.use(() => { throw new Error('yeah') });
