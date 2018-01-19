@@ -1,42 +1,68 @@
-# mware-async
+# mware-ts
 
-[![Build Status](https://travis-ci.org/9technology/mware-async.svg?branch=master)](https://travis-ci.org/9technology/mware-async) [![Coverage Status](https://coveralls.io/repos/github/9technology/mware-async/badge.svg?branch=master)](https://coveralls.io/github/9technology/mware-async?branch=master)
+[![Build Status](https://travis-ci.org/getstation/mware-ts.svg?branch=master)](https://travis-ci.org/getstation/mware-ts)
 
-`mware-async` is an extension to [`mware`](https://github.com/tur-nr/node-mware) but for an async/await style middleware stack.
+`mware-ts` is an extension to [`mware`](https://github.com/tur-nr/node-mware) but for Typescript, with an async/await style middleware stack.
 
 ### Usage
 
-```js
-import mware from 'mware-async';
+```typescript
+import mware, { Event } from 'mware-ts';
 const { use, run } = mware();
 
-const context = {};
+const e = new Event('test');
 
 // add middleware
-use(async (ctx, next) => {
-    console.assert(ctx === context);
+use(async (event, ...args) => {
+    console.assert(e === event);
     console.log('a');
-    await next();
-    console.log('b');
+    return args;
 });
 
-use(async (ctx, next) => {
-    console.log('c');
-    await next();
+use(async (event, arg1, arg2) => {
+    console.log('b');
+    return await Promise.resolve(
+      [arg1, arg2 + 8]
+    );
 });
 
 // run stack
-run(context).then(() => console.log('fin')); // a, c, b, fin
+run(e, 7, 5).then(() => console.log('fin')); // returns [e, [7, 13]]
+```
+
+#### Using Event
+
+```typescript
+import mware, { Event } from 'mware-ts';
+const { use, run } = mware();
+
+const e = new Event('my-event');
+
+// add middleware
+use(async (event, value) => {
+    if (value === 'prevent') {
+      event.preventDefault();
+    }
+    return value;
+});
+
+// run stack
+run(e, 'continue').then(([e, value]) => console.log(e.isDefaultPrevented())); // false
+run(e, 'prevent').then(([e, value]) => console.log(e.isDefaultPrevented())); // true
+
 ```
 
 #### Errors
 
-```js
+```typescript
+import mware, { Event } from 'mware-ts';
+const { use, run } = mware();
+
 // error middleware
-use(async () => throw new Error('Bad stuff!'));
+use(async () => { throw new Error('Bad stuff!') });
 
 // run
-run().catch(err => console.error(err)); // [Error: Bad stuff!]
+run(new Event('test')).catch(err => console.error(err)); // [Error: Bad stuff!]
 ```
 
 ## Installation
@@ -44,13 +70,13 @@ run().catch(err => console.error(err)); // [Error: Bad stuff!]
 #### NPM
 
 ```
-npm install --save mware-async
+npm install --save mware-ts
 ```
 
 #### Yarn
 
 ```
-yarn add mware-async
+yarn add mware-ts
 ```
 
 ## API
@@ -58,12 +84,20 @@ yarn add mware-async
 ##### `mware()`
 Returns a `mware` instance.
 
+##### `Event`
+Must be instanciated and passed as `#run` first parameter.
+
+Usage: `new Event(string)`
+
+Event objects have `preventDefault()` and `isDefaultPrevented()` methods.
+
 #### Instance
 
-##### `#use(fn...)`
-* `fn: Function|[]Function`, Async middleware functions to add to stack.
+##### `#use(fn: Function)`
+* `fn: Function`, Async middleware functions to add to stack.
 
-##### `#run([...args])`
+##### `#run(e: Event, ...args: any[])`
+* `e: Event`, Instance of `Event` class.
 * `args: *`, Arguments to pass to each middleware function.
 
 Returns a promise.
@@ -72,4 +106,4 @@ Returns a promise.
 
 [BSD-3-Clause](LICENSE)
 
-Copyright (c) 2016 [9Technology](https://github.com/9technology)
+Copyright (c) 2016 [Station](https://github.com/getstation)
